@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <title>Flexbox</title>
+     <style type="text/css">
+     	#container {
+            width: 800px;
+            margin: 50px auto 0 auto;
+        }
+        .flexbox {
+            width: 800px;
+            border: 1px solid black;
+            
+            display: -moz-box;
+            -moz-box-orient: horizontal;
+            -moz-box-pack: center;
+            -moz-box-align: center;
+            /*-moz-flex-flow: row-reverse;*/
+            -moz-flex-flow: wrap;
+        }
+        .flexbox p {
+            border: 1px solid blue;
+            margin: 10px;
+            padding: 5px;
+            height: 200px;
+
+        }
+
+        .flexbox > p:nth-child(5), .flexbox > p:nth-child(1) {
+            -moz-box-flex: 1;
+        }
+
+        .flexbox > p:nth-child(3) {
+            -moz-box-flex: 3;
+        }
+     </style>    
+</head>
+
+<body>
+     <div id="container">
+        <div class="flexbox">
+            <p>Child 1</p>
+            <p>Child 2</p>
+            <p>Child 3</p>
+            <p>Child 4</p>
+            <p>Child 5</p>
+        </div>
+     </div>
+</body>
+</html>

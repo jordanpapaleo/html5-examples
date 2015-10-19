@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <title>Geoloaction API</title>
+
+     <!-- <link rel="stylesheet/less" href="alerts.less" type="text/css" /> -->
+     <script src="http://lesscss.googlecode.com/files/less-1.0.30.min.js"></script>
+
+     <style type="text/css">
+          input, label {
+               display: block;
+          }
+
+          #maplink {
+               display: none;
+          }
+     </style>    
+</head>
+
+<body>
+     <section>
+          <h1>Show Position</h1>
+          <input type="button" id="geoLocationButton" value="Get Location" />
+          
+
+          <label for="lat">Latitude:</label>
+          <input type="text" id="lat" name="lat" />
+
+          <label for="long">Longitude:</label>
+          <input type="text" id="long" name="long" />
+
+          <label for="alt">Altitude:</label>
+          <input type="text" id="alt" name="alt" />
+
+          <label for="altacc">Accuracy:</label>
+          <input type="text" id="altacc" name="altacc" />
+
+          <label for="lat">Altitude Accuracy:</label>
+          <input type="text" id="lat" name="lat" />
+
+          <label for="heading">Heading:</label>
+          <input type="text" id="heading" name="heading" />
+
+          <label for="speed">Speed:</label>
+          <input type="text" id="speed" name="speed" />
+
+          <label for="timestamp">Timestamp:</label>
+          <input type="text" id="timestamp" name="timestamp" />
+
+          <a href="javascript:void(0);" id="maplink" target="_blank">View Map</a>
+
+          <ul id="log"></ul>
+     </section>
+
+     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+     <script type="text/javascript">
+          $(document).ready(function(){
+               new Geolocation().BindEvents();
+          });
+
+          var Geolocation = function() {}
+
+          Geolocation.prototype.BindEvents = function() {
+               console.log("this", this);
+
+               var self = this;
+
+               $("#geoLocationButton").on("click", function(){
+                    navigator.geolocation.getCurrentPosition(self.ShowPosition1.apply(self), self.HandleError);
+                    
+                    // var blar = {
+                    //      coords : {
+                    //           latitude: 64,
+                    //           longitude: 100
+                    //      }
+                    // }
+
+                    // self.ShowPosition1(blar)
+               });
+          }
+
+          Geolocation.prototype.ShowPosition1 = function(position) {
+               console.log("this", this);
+
+               var coords = position.coords;
+
+               $("#lat").val(coords.latitude);
+               $("#long").val(coords.longitude);
+               // $("#acc").val(coords.accuracy);
+               // $("#alt").val(coords.altitude);
+               // $("#altacc").val(coords.altitudeAccuracy);
+               // $("#heading").val(coords.heading);
+               // $("#speed").val(coords.speed);
+               // $("#timestamp").val(coords.timestamp);
+
+               this.RenderMapLink(coords.latitude, coords.longitude);
+               this.RenderMap(coords.latitude, coords.longitude);
+          }
+
+          Geolocation.prototype.RenderMapLink = function(latCoords, longCoords) {
+               var $maplink = $("#maplink");
+
+               var mapUrl = "http://maps.google.com/maps?q=" + latCoords + ",+" + longCoords + "+(You+are+here!)&iwloc=A&hl=en";
+
+               $maplink.attr("href", mapUrl);
+
+               $maplink.show();
+          }
+
+          Geolocation.prototype.RenderMap = function(latCoords, longCoords) {
+               $("#map").remove();
+
+               var latlon = latCoords + "," + longCoords;
+               var img_url="http://maps.googleapis.com/maps/api/staticmap?center=" + latlon + "&zoom=14&size=400x300&sensor=false";
+               
+               var $map = $("<img id='map' src='" + img_url + "'>");
+
+               $("section").append($map);
+          }
+
+          Geolocation.prototype.HandleError = function(error) {
+               switch(error.code) {
+                    case 0:
+                         //error.UNKNOWN_ERROR
+                         this.LogMsg("An unknown error occurred");
+                         break;
+                    case 1:
+                         //error.PERMISSION_DENIED
+                         this.LogMsg("User denied the request for Geolocation");
+                         break;
+                    case 2:
+                         //error.POSITION_UNAVAILABLE
+                         this.LogMsg("Location information is unavailable");
+                         break;
+                    case 3:
+                         //error.TIMEOUT
+                         this.LogMsg("The request to get user location timed out");
+                         break;
+               }
+          }
+
+          Geolocation.prototype.LogMsg = function(msg) {
+               $("#log").append("<li>" + msg + "</li>");
+          }
+     </script>
+</body>
+</html> 

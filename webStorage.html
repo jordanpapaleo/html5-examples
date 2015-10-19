@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <title>TITLE</title>
+     <style type="text/css">
+     	#messageContainer {
+			height: 20px;
+			font-family: Arial;
+			width: 200px;
+			display: block;
+			margin-bottom: 25px;
+		}
+
+		textarea {
+			width: 500px;
+		}
+     </style>    
+</head>
+
+<body>
+     <div id="container">
+    	<h1>Using Local Storage</h1>
+    	<h2>Task List</h2>
+    	<div id="messageContainer"><span id="msg"></span></div>
+    	<textarea id="taskBox" autofocus></textarea>
+    	<button id="saveButton">Save</button>
+    	<a href="javascript:void(0);" id="deleteAllLink">Delete All</a>
+     </div>
+
+     <div id="scripts">
+          <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+          <script type="text/javascript">
+               $(function() {
+               		var $taskBox = $("#taskBox");
+               		var $msg = $("#msg");
+               		var $saveButton = $("#saveButton");
+               		var $deleteLink = $("#deleteAllLink");
+
+               		if(window.localStorage || window.sessionStorage) {
+               			if(null != window.localStorage.taskList) {
+               				var tasks = window.localStorage.taskList;
+               				var taskList = tasks.split(",").join("\n");
+               				$taskBox.val(taskList);
+               			}
+
+               			if(null != window.sessionStorage) {
+               				var tasks = window.localStorage.taskList;
+               				var taskList = tasks.split(",").join("\n");
+               				$taskBox.val(taskList);
+               			}
+               		}
+
+               		$saveButton.on("click", function(){
+               			localSave();
+               			showMessage("Saved");
+               		});
+
+               		$deleteLink.on("click", function(){
+               			localDelete();
+               			showMessage("Deleted");
+               		});
+
+               		function localDelete() {
+               			window.localStorage.removeItem("taskList");
+               			$taskBox.val("");
+               		}
+
+               		function localSave() {
+               			var tasks = $taskBox.val();
+               			var taskList = tasks.split("\n").join(",");
+               			window.localStorage.taskList = taskList;
+               		}
+               
+
+               		function sessionDelete() {
+
+               			
+               		}
+
+               		function sessionSave() {
+               			var data = {
+               				"tasks" : $taskBox.val().split("\n").join(",")
+               			}
+
+               			var session = window.sessionStorage;
+               			var dataString = JSON.stringify(data);
+
+               			session.setItem("taskList", dataString);
+               		}
+
+               		function showMessage(message) {
+               			$msg.html(message);
+               			$msg.show();
+               			$msg.fadeOut(1000);
+               		}
+                });
+
+			
+          </script>
+     </div>
+</body>
+</html>

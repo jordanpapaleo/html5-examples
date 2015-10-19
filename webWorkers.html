@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <title>Web Workers: Generate Fibonacci Series</title>
+     <style type="text/css">
+        #wrapper {
+            margin: 0 auto;
+            width: 814px;
+        }
+        
+        #test1, #test2 {
+            border: 1px solid #a1a1a1;
+            padding: 10px 40px; 
+            background: #dddddd;
+            width:300px;
+            border-radius:10px;
+            float: left;
+        }
+
+        body {
+            font-family: Arial;
+        }
+
+        ol {
+            margin: 20px 0 0;
+            padding: 0;
+        }
+
+     	li {
+            background-color: #FFF;
+            padding-left: 5px;
+            margin: 4px;
+        }
+     </style>    
+</head>
+
+<body>
+    <div id="wrapper">
+    	<h1>Fibonacci Series</h1>
+        <div id="test1" style="margin-right: 50px">
+        	<h2>Without Web Workers</h2>
+            
+            <img id="loadImg1" src="load2.gif" /><br />
+            
+            <input type="numeric" id="seriesLength1" value="40" />
+            <input type="button" id="generateButton1" value="Generate Series" />
+
+            <ol id="log1"></ol>
+        </div>
+        <div id="test2">
+            <h2>With Web Workers</h2>
+            
+            <img id="loadImg2" src="load2.gif" /><img id="loadOff" src="loadOff.gif" /><br />
+            
+            <input type="numeric" id="seriesLength2" value="40" />
+            <input type="button" id="generateButton2" value="Generate Series" />
+
+            <ol id="log2"></ol>
+        </div>
+    </div>
+</body>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        var results = [];
+        var logs;
+        var $log1 = $("#log1");
+
+        $(function(){
+
+            $("#generateButton1").on("click", function(){
+                $log1.html("");
+
+                var seriesLength = parseInt($("#seriesLength1").val());
+
+                generateFibonacciSeries(seriesLength);
+
+                for(var i = 0; i < results.length; i++) {
+                    logMsg1(results[i]);
+                }
+            });
+        });
+
+        function calculateNextFibonacciValue(n) {
+            var s = 0;
+            var returnValue;
+
+            if(n == 0) {
+                return (s);
+            }
+
+            if(n == 1) {
+                return s += 1;
+            }
+            else {
+                return (calculateNextFibonacciValue(n-1) + calculateNextFibonacciValue(n-2));
+            }
+        }
+
+        function generateFibonacciSeries(n) {
+            results.length = 0;
+
+            for(var i = 0; i < n; i++) {
+                results.push(calculateNextFibonacciValue(i));
+            }
+        }
+        
+        function logMsg1(msg) {
+            $log1.append("<li>" + msg + "</li>");
+        }
+    </script>
+
+    <script type="text/javascript">
+        var $log2 = $("#log2");
+        var $loadImg2 = $("#loadImg2");
+        var $loadOff = $("#loadOff");
+        var worker;
+
+        $(function(){
+            $loadImg2.hide();
+
+            $("#generateButton2").on("click", function(){
+                var seriesLength = parseInt($("#seriesLength2").val());
+
+                $log2.html("");
+
+                $loadOff.hide();
+                $loadImg2.show();
+
+                worker = new Worker("fibonacci.js");
+                worker.onmessage = messageHandler;
+                worker.onerror = errorHandler;
+                worker.postMessage(seriesLength);
+            });
+        });
+
+        function messageHandler(e) {
+            var results = e.data;
+
+            for(var i = 0; i < results.length; i++) {
+                logMsg2(results[i]);
+            }
+
+            $loadImg2.hide();
+            $loadOff.show();
+        }
+
+        function errorHandler(e) {
+            logMsg2(e.message);
+        }
+
+        function logMsg2(msg) {
+            $log2.append("<li>" + msg + "</li>");
+        }
+    </script>
+</html>
